@@ -131,12 +131,6 @@ export const generateImageIndex = async (): Promise<void> => {
   try {
     const allFiles = await walk(imagesDir)
 
-    if (allFiles.length === 0) {
-      spinner.stop()
-      ui.info("No images found in the specified directory")
-      return
-    }
-
     spinner.text = "Processing images..."
 
     const usedVarNames = new Set<string>()
@@ -195,10 +189,12 @@ export const generateImageIndex = async (): Promise<void> => {
 
     spinner.stop()
 
-    ui.success(
-      "Image index generated successfully!",
-      `Generated ${path.relative(process.cwd(), outputFile)} with ${allFiles.length} images`
-    )
+    const message =
+      allFiles.length === 0
+        ? "Image index generated with empty object (no images found)"
+        : `Image index generated successfully with ${allFiles.length} images`
+
+    ui.success("Image index generated successfully!", message)
 
     // Show summary
     ui.table([
