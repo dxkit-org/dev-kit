@@ -6,6 +6,7 @@ import {
   DK_CONFIG_LATEST_VERSION,
   DatabaseConfig,
   DatabaseType,
+  SpringBootConfig,
 } from "../types/config"
 
 const CONFIG_FILE = "dk.config.json"
@@ -55,7 +56,13 @@ export function detectProjectType(
   // node-express: look for express in package.json deps
   // vite-react: look for vite and react in package.json deps
   // react-native-cli: look for react-native in package.json deps
+  // spring-boot-microservice: look for pom.xml files or Spring Boot structure
   try {
+    // Check for Spring Boot first
+    if (detectSpringBootProject(rootDir)) {
+      return "spring-boot-microservice"
+    }
+
     const pkgPath = join(rootDir, "package.json")
     if (!existsSync(pkgPath)) return null
     const pkg = JSON.parse(readFileSync(pkgPath, "utf8"))
@@ -65,6 +72,53 @@ export function detectProjectType(
     if (deps["react-native"]) return "react-native-cli"
   } catch {}
   return null
+}
+
+// Detect Spring Boot project structure
+function detectSpringBootProject(rootDir: string): boolean {
+  try {
+    const items = readdirSync(rootDir, { withFileTypes: true })
+
+    // Look for multiple directories that might be Spring Boot services
+    const serviceDirectories = items
+      .filter((item) => item.isDirectory())
+      .filter((dir) => {
+        const servicePath = join(rootDir, dir.name)
+        const hasPom = existsSync(join(servicePath, "pom.xml"))
+        const hasGradle =
+          existsSync(join(servicePath, "build.gradle")) ||
+          existsSync(join(servicePath, "build.gradle.kts"))
+        const hasMvnw =
+          existsSync(join(servicePath, "mvnw")) ||
+          existsSync(join(servicePath, "mvnw.cmd"))
+
+        return hasPom || hasGradle || hasMvnw
+      })
+
+    // Consider it a Spring Boot microservice project if we have 2+ services
+    // or if we have typical microservice directory names
+    if (serviceDirectories.length >= 2) return true
+
+    const microservicePatterns = [
+      /.*service.*/,
+      /.*gateway.*/,
+      /.*registry.*/,
+      /.*discovery.*/,
+      /.*config.*/,
+      /.*auth.*/,
+      /.*user.*/,
+      /.*payment.*/,
+      /.*transaction.*/,
+    ]
+
+    return serviceDirectories.some((dir) =>
+      microservicePatterns.some((pattern) =>
+        pattern.test(dir.name.toLowerCase())
+      )
+    )
+  } catch {
+    return false
+  }
 }
 
 // Database detection for node-express projects

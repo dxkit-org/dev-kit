@@ -24,6 +24,7 @@ import {
 } from "../src/utils/config.js"
 import { init as runInit } from "../src/commands/init.js"
 import { updateConfig } from "../src/commands/config.js"
+import { startSpringBootServices } from "../src/commands/springBoot.js"
 
 // Get package.json version
 const __filename = fileURLToPath(import.meta.url)
@@ -488,6 +489,24 @@ async function main() {
       await cmd.execute(...args)
     })
 
+  // Spring Boot commands
+  const sbCommand = program
+    .command("sb")
+    .alias("spring-boot")
+    .description(chalk.gray("🍃 Spring Boot microservices tools"))
+
+  sbCommand
+    .command("start")
+    .description(chalk.gray("🚀 Start all Spring Boot services in order"))
+    .action(async (...args) => {
+      const cmd = createEnhancedCommand(
+        "Spring Boot start",
+        "Starting microservices",
+        startSpringBootServices
+      )
+      await cmd.execute(...args)
+    })
+
   // Add help enhancement
   program.on("--help", () => {
     console.log("\n")
@@ -511,6 +530,9 @@ async function main() {
           "\n" +
           chalk.gray("• No Clean: ") +
           chalk.cyan("dk rn brnc") +
+          "\n" +
+          chalk.gray("• Spring Boot: ") +
+          chalk.cyan("dk sb start") +
           "\n" +
           chalk.gray("• Help: ") +
           chalk.cyan("dk --help"),
