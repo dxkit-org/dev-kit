@@ -25,6 +25,7 @@ import {
 import { init as runInit } from "../src/commands/init.js"
 import { updateConfig } from "../src/commands/config.js"
 import { startSpringBootServices } from "../src/commands/springBoot.js"
+import { assets } from "../src/commands/assets.js"
 
 // Get package.json version
 const __filename = fileURLToPath(import.meta.url)
@@ -507,6 +508,24 @@ async function main() {
       await cmd.execute(...args)
     })
 
+  // Assets commands
+  const assetsCommand = program
+    .command("assets")
+    .description(chalk.gray("🎨 Generate type-safe asset imports"))
+
+  assetsCommand
+    .command("gen")
+    .alias("generate")
+    .description(chalk.gray("🖼️ Generate image index file"))
+    .action(async (...args) => {
+      const cmd = createEnhancedCommand(
+        "Assets generation",
+        "Generating image index",
+        assets
+      )
+      await cmd.execute(...args)
+    })
+
   // Add help enhancement
   program.on("--help", () => {
     console.log("\n")
@@ -533,6 +552,9 @@ async function main() {
           "\n" +
           chalk.gray("• Spring Boot: ") +
           chalk.cyan("dk sb start") +
+          "\n" +
+          chalk.gray("• Assets: ") +
+          chalk.cyan("dk assets gen") +
           "\n" +
           chalk.gray("• Help: ") +
           chalk.cyan("dk --help"),

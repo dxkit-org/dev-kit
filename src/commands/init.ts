@@ -11,6 +11,7 @@ import type {
   DatabaseConfig,
   DatabaseType,
   SpringBootConfig,
+  AssetsTypeGeneratorConfig,
 } from "../types/config"
 
 const PROJECT_TYPES: { name: string; value: DKProjectType }[] = [
@@ -46,6 +47,7 @@ export async function init() {
   if (projectType) {
     let databaseConfig: DatabaseConfig | undefined
     let springBootConfig: SpringBootConfig | undefined
+    let assetsTypeGeneratorConfig: AssetsTypeGeneratorConfig | undefined
 
     // If it's a node-express project, detect database configuration
     if (projectType === "node-express") {
@@ -57,10 +59,24 @@ export async function init() {
       springBootConfig = await detectAndConfigureSpringBootServices()
     }
 
+    // If it's a supported frontend project, configure assets type generator
+    const frontendTypes: DKProjectType[] = [
+      "vite-react",
+      "react-native-cli",
+      "nextjs",
+    ]
+    if (frontendTypes.includes(projectType)) {
+      assetsTypeGeneratorConfig =
+        await configureAssetsTypeGenerator(projectType)
+    }
+
     const config = {
       projectType,
       ...(databaseConfig && { database: databaseConfig }),
       ...(springBootConfig && { springBoot: springBootConfig }),
+      ...(assetsTypeGeneratorConfig && {
+        assetsTypeGenerator: assetsTypeGeneratorConfig,
+      }),
     }
     writeConfig(config)
 
@@ -70,6 +86,9 @@ export async function init() {
     }
     if (springBootConfig) {
       ui.info("Spring Boot services detected and added to config.")
+    }
+    if (assetsTypeGeneratorConfig) {
+      ui.info("Assets type generator configuration added to config.")
     }
   } else {
     ui.error("No project type selected. dk.config.json not created.")
@@ -215,4 +234,50 @@ async function detectAndConfigureDatabase(): Promise<
   }
 
   return config
+}
+
+async function configureAssetsTypeGenerator(
+  projectType: DKProjectType
+): Promise<AssetsTypeGeneratorConfig | undefined> {
+  const { configureAssets } = await inquirer.prompt({
+    type: "confirm",
+    name: "configureAssets",
+    message: "Would you like to configure automatic image type generation?",
+    default: true,
+  })
+
+  if (!configureAssets) {
+    return undefined
+  }
+
+  // Suggest default paths based on project type
+  let defaultPath = ""
+  switch (projectType) {
+    case "vite-react":
+      defaultPath = "src/assets/images"
+      break
+    case "react-native-cli":
+      defaultPath = "src/assets/images"
+      break
+    case "nextjs":
+      defaultPath = "public/images"
+      break
+  }
+
+  const { imagesDir } = await inquirer.prompt({
+    type: "input",
+    name: "imagesDir",
+    message: "Enter the path to your images directory:",
+    default: defaultPath,
+    validate: (input: string) => {
+      if (!input.trim()) {
+        return "Images directory path cannot be empty"
+      }
+      return true
+    },
+  })
+
+  return {
+    imagesDir: imagesDir.trim(),
+  }
 }

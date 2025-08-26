@@ -25,11 +25,16 @@ export interface SpringBootConfig {
   services: SpringBootService[]
 }
 
+export interface AssetsTypeGeneratorConfig {
+  imagesDir: string
+}
+
 export interface DKConfig {
   version: number
   projectType: DKProjectType
   database?: DatabaseConfig
   springBoot?: SpringBootConfig
+  assetsTypeGenerator?: AssetsTypeGeneratorConfig
 }
 
 export const DK_CONFIG_LATEST_VERSION = 1
