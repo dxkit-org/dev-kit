@@ -17,8 +17,13 @@ import {
   buildAndroidDebug,
 } from "../src/commands/reactnative.js"
 import { ui } from "../src/utils/ui-helpers.js"
-import { configExists } from "../src/utils/config.js"
+import {
+  configExists,
+  readConfig,
+  isConfigOutdated,
+} from "../src/utils/config.js"
 import { init as runInit } from "../src/commands/init.js"
+import { updateConfig } from "../src/commands/config.js"
 
 // Get package.json version
 const __filename = fileURLToPath(import.meta.url)
@@ -145,17 +150,40 @@ process.on("uncaughtException", (error) => {
 
 // Main execution function
 async function main() {
+  // Register config upgrade command
+  const program = new Command()
+
+  const configCmd = program
+    .command("config")
+    .description(chalk.gray("Manage dk.config.json"))
+
+  configCmd
+    .command("update")
+    .description(chalk.gray("Update dk.config.json to latest version"))
+    .action(async () => {
+      await updateConfig()
+    })
   // Show banner only at the start
   await showWelcomeBanner()
 
-  // Ensure dk.config.json exists before running any command except init
+  // Ensure dk.config.json exists before running any command except init/config
   const isInitCmd = process.argv.includes("init")
-  if (!configExists() && !isInitCmd) {
+  const isConfigCmd = process.argv.includes("config")
+  if (!configExists() && !isInitCmd && !isConfigCmd) {
     ui.info("dk.config.json not found. Running init...")
     await runInit()
   }
 
-  const program = new Command()
+  // Check config version and warn if outdated
+  if (configExists() && !isInitCmd && !isConfigCmd) {
+    const config = readConfig()
+    if (isConfigOutdated(config)) {
+      ui.warning(
+        "Your dk.config.json is outdated.",
+        "Run 'dk config update' to update your config file."
+      )
+    }
+  }
 
   program
     .name(chalk.bold.cyan("dk"))

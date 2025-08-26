@@ -1,6 +1,10 @@
 import { existsSync, readFileSync, writeFileSync } from "fs"
 import { join } from "path"
-import { DKConfig, DKProjectType } from "../types/config"
+import {
+  DKConfig,
+  DKProjectType,
+  DK_CONFIG_LATEST_VERSION,
+} from "../types/config"
 
 const CONFIG_FILE = "dk.config.json"
 
@@ -18,13 +22,26 @@ export function readConfig(rootDir: string = process.cwd()): DKConfig | null {
   return JSON.parse(raw)
 }
 
+export function getConfigVersion(config: DKConfig | null): number {
+  if (!config || typeof config.version !== "number") return 0
+  return config.version
+}
+
+export function isConfigOutdated(config: DKConfig | null): boolean {
+  return getConfigVersion(config) < DK_CONFIG_LATEST_VERSION
+}
+
 export function writeConfig(
-  config: DKConfig,
+  config: Omit<DKConfig, "version"> & { version?: number },
   rootDir: string = process.cwd()
 ): void {
+  const toWrite: DKConfig = {
+    version: DK_CONFIG_LATEST_VERSION,
+    ...config,
+  }
   writeFileSync(
     getConfigPath(rootDir),
-    JSON.stringify(config, null, 2) + "\n",
+    JSON.stringify(toWrite, null, 2) + "\n",
     "utf8"
   )
 }
