@@ -250,24 +250,33 @@ async function configureAssetsTypeGenerator(
     return undefined
   }
 
-  // Suggest default paths based on project type
+  // Check if src/assets/images exists in the current directory
+  const fs = await import("fs")
+  const srcAssetsImages = "src/assets/images"
+  const srcAssetsImagesExists = fs.existsSync(srcAssetsImages)
+
+  // Suggest default paths based on project type and existing directories
   let defaultPath = ""
-  switch (projectType) {
-    case "vite-react":
-      defaultPath = "src/assets/images"
-      break
-    case "react-native-cli":
-      defaultPath = "src/assets/images"
-      break
-    case "nextjs":
-      defaultPath = "public/images"
-      break
+  if (srcAssetsImagesExists) {
+    defaultPath = srcAssetsImages
+  } else {
+    switch (projectType) {
+      case "vite-react":
+        defaultPath = "src/assets/images"
+        break
+      case "react-native-cli":
+        defaultPath = "src/assets/images"
+        break
+      case "nextjs":
+        defaultPath = "public/images"
+        break
+    }
   }
 
   const { imagesDir } = await inquirer.prompt({
     type: "input",
     name: "imagesDir",
-    message: "Enter the path to your images directory:",
+    message: `Enter the path to your images directory:${srcAssetsImagesExists ? " (detected existing directory)" : ""}`,
     default: defaultPath,
     validate: (input: string) => {
       if (!input.trim()) {
