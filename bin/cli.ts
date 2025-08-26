@@ -8,6 +8,7 @@ import boxen from "boxen"
 import gradientString from "gradient-string"
 import figlet from "figlet"
 import ora from "ora"
+
 import { clean } from "../src/commands/clean.js"
 import { deployDev, deployProd } from "../src/commands/deploy.js"
 import { doctor } from "../src/commands/doctor.js"
@@ -16,6 +17,8 @@ import {
   buildAndroidDebug,
 } from "../src/commands/reactnative.js"
 import { ui } from "../src/utils/ui-helpers.js"
+import { configExists } from "../src/utils/config.js"
+import { init as runInit } from "../src/commands/init.js"
 
 // Get package.json version
 const __filename = fileURLToPath(import.meta.url)
@@ -144,6 +147,13 @@ process.on("uncaughtException", (error) => {
 async function main() {
   // Show banner only at the start
   await showWelcomeBanner()
+
+  // Ensure dk.config.json exists before running any command except init
+  const isInitCmd = process.argv.includes("init")
+  if (!configExists() && !isInitCmd) {
+    ui.info("dk.config.json not found. Running init...")
+    await runInit()
+  }
 
   const program = new Command()
 
