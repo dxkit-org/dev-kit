@@ -15,7 +15,7 @@ import { doctor } from "../src/commands/doctor.js"
 import {
   buildAndroidRelease,
   buildAndroidDebug,
-} from "../src/commands/reactnative.js"
+} from "../src/commands/reactNative.js"
 import { ui } from "../src/utils/ui-helpers.js"
 import {
   configExists,
