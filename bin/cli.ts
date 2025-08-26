@@ -201,6 +201,19 @@ async function main() {
     })
 
   program
+    .command("init")
+    .alias("i")
+    .description(chalk.gray("🚀 Initialize dk.config.json"))
+    .action(async (...args) => {
+      const cmd = createEnhancedCommand(
+        "init",
+        "Initializing configuration",
+        runInit
+      )
+      await cmd.execute(...args)
+    })
+
+  program
     .command("clean")
     .alias("c")
     .description(chalk.gray("🧹 Clean temporary files"))

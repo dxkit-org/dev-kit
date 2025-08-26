@@ -1,9 +1,11 @@
-import { existsSync, readFileSync, writeFileSync } from "fs"
+import { existsSync, readFileSync, writeFileSync, readdirSync } from "fs"
 import { join } from "path"
 import {
   DKConfig,
   DKProjectType,
   DK_CONFIG_LATEST_VERSION,
+  DatabaseConfig,
+  DatabaseType,
 } from "../types/config"
 
 const CONFIG_FILE = "dk.config.json"
@@ -63,4 +65,92 @@ export function detectProjectType(
     if (deps["react-native"]) return "react-native-cli"
   } catch {}
   return null
+}
+
+// Database detection for node-express projects
+export function detectDatabaseConfig(
+  rootDir: string = process.cwd()
+): DatabaseConfig | null {
+  const databaseDir = join(rootDir, "database")
+  
+  if (!existsSync(databaseDir)) {
+    return null
+  }
+
+  const config: DatabaseConfig = {}
+
+  try {
+    // Check for dumps directory
+    const dumpsDir = join(databaseDir, "dumps")
+    if (existsSync(dumpsDir)) {
+      config.dumpsDir = "database/dumps"
+    }
+
+    // Check for migrations directory
+    const migrationsDir = join(databaseDir, "migrations")
+    if (existsSync(migrationsDir)) {
+      config.migrationsDir = "database/migrations"
+    }
+
+    // Check for .env file and database URL
+    const envPath = join(rootDir, ".env")
+    if (existsSync(envPath)) {
+      const envContent = readFileSync(envPath, "utf8")
+      const envConfig = parseEnvForDatabase(envContent)
+      if (envConfig) {
+        Object.assign(config, envConfig)
+      }
+    }
+
+    return Object.keys(config).length > 0 ? config : null
+  } catch (error) {
+    return null
+  }
+}
+
+// Parse .env file for database configuration
+function parseEnvForDatabase(envContent: string): Partial<DatabaseConfig> | null {
+  const lines = envContent.split('\n')
+  const config: Partial<DatabaseConfig> = {}
+
+  for (const line of lines) {
+    const trimmedLine = line.trim()
+    if (!trimmedLine || trimmedLine.startsWith('#')) continue
+
+    const [key, value] = trimmedLine.split('=', 2)
+    if (!key || !value) continue
+
+    // Look for database URL patterns
+    if (key.includes('DATABASE_URL') && value.includes('://')) {
+      config.dbUrlEnvName = key
+      
+      try {
+        const url = new URL(value)
+        const protocol = url.protocol.slice(0, -1) // Remove trailing ':'
+        
+        // Extract database type from protocol
+        if (protocol === 'mysql') {
+          config.dbType = 'mysql'
+        } else if (protocol === 'postgres' || protocol === 'postgresql') {
+          config.dbType = 'postgres'
+        } else if (protocol === 'sqlite') {
+          config.dbType = 'sqlite'
+        } else if (protocol === 'mongodb' || protocol === 'mongo') {
+          config.dbType = 'mongodb'
+        }
+
+        // Extract database name from pathname
+        if (url.pathname && url.pathname.length > 1) {
+          const dbName = url.pathname.split('/')[1]?.split('?')[0]
+          if (dbName) {
+            config.dbName = dbName
+          }
+        }
+      } catch (error) {
+        // If URL parsing fails, we'll ask the user later
+      }
+    }
+  }
+
+  return Object.keys(config).length > 0 ? config : null
 }
