@@ -72,7 +72,7 @@ export function detectDatabaseConfig(
   rootDir: string = process.cwd()
 ): DatabaseConfig | null {
   const databaseDir = join(rootDir, "database")
-  
+
   if (!existsSync(databaseDir)) {
     return null
   }
@@ -109,39 +109,41 @@ export function detectDatabaseConfig(
 }
 
 // Parse .env file for database configuration
-function parseEnvForDatabase(envContent: string): Partial<DatabaseConfig> | null {
-  const lines = envContent.split('\n')
+function parseEnvForDatabase(
+  envContent: string
+): Partial<DatabaseConfig> | null {
+  const lines = envContent.split("\n")
   const config: Partial<DatabaseConfig> = {}
 
   for (const line of lines) {
     const trimmedLine = line.trim()
-    if (!trimmedLine || trimmedLine.startsWith('#')) continue
+    if (!trimmedLine || trimmedLine.startsWith("#")) continue
 
-    const [key, value] = trimmedLine.split('=', 2)
+    const [key, value] = trimmedLine.split("=", 2)
     if (!key || !value) continue
 
     // Look for database URL patterns
-    if (key.includes('DATABASE_URL') && value.includes('://')) {
+    if (key.includes("DATABASE_URL") && value.includes("://")) {
       config.dbUrlEnvName = key
-      
+
       try {
         const url = new URL(value)
         const protocol = url.protocol.slice(0, -1) // Remove trailing ':'
-        
+
         // Extract database type from protocol
-        if (protocol === 'mysql') {
-          config.dbType = 'mysql'
-        } else if (protocol === 'postgres' || protocol === 'postgresql') {
-          config.dbType = 'postgres'
-        } else if (protocol === 'sqlite') {
-          config.dbType = 'sqlite'
-        } else if (protocol === 'mongodb' || protocol === 'mongo') {
-          config.dbType = 'mongodb'
+        if (protocol === "mysql") {
+          config.dbType = "mysql"
+        } else if (protocol === "postgres" || protocol === "postgresql") {
+          config.dbType = "postgres"
+        } else if (protocol === "sqlite") {
+          config.dbType = "sqlite"
+        } else if (protocol === "mongodb" || protocol === "mongo") {
+          config.dbType = "mongodb"
         }
 
         // Extract database name from pathname
         if (url.pathname && url.pathname.length > 1) {
-          const dbName = url.pathname.split('/')[1]?.split('?')[0]
+          const dbName = url.pathname.split("/")[1]?.split("?")[0]
           if (dbName) {
             config.dbName = dbName
           }

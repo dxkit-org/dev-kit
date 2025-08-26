@@ -1,7 +1,16 @@
 import inquirer from "inquirer"
 import { ui } from "../utils/ui-helpers"
-import { configExists, writeConfig, detectProjectType, detectDatabaseConfig } from "../utils/config"
-import type { DKProjectType, DatabaseConfig, DatabaseType } from "../types/config"
+import {
+  configExists,
+  writeConfig,
+  detectProjectType,
+  detectDatabaseConfig,
+} from "../utils/config"
+import type {
+  DKProjectType,
+  DatabaseConfig,
+  DatabaseType,
+} from "../types/config"
 
 const PROJECT_TYPES: { name: string; value: DKProjectType }[] = [
   { name: "Node.js (Express)", value: "node-express" },
@@ -39,9 +48,12 @@ export async function init() {
       databaseConfig = await detectAndConfigureDatabase()
     }
 
-    const config = { projectType, ...(databaseConfig && { database: databaseConfig }) }
+    const config = {
+      projectType,
+      ...(databaseConfig && { database: databaseConfig }),
+    }
     writeConfig(config)
-    
+
     ui.success("Created dk.config.json", `Project type: ${projectType}`)
     if (databaseConfig) {
       ui.info("Database configuration detected and added to config.")
@@ -51,9 +63,11 @@ export async function init() {
   }
 }
 
-async function detectAndConfigureDatabase(): Promise<DatabaseConfig | undefined> {
+async function detectAndConfigureDatabase(): Promise<
+  DatabaseConfig | undefined
+> {
   const detectedConfig = detectDatabaseConfig()
-  
+
   if (!detectedConfig) {
     return undefined
   }
@@ -63,7 +77,7 @@ async function detectAndConfigureDatabase(): Promise<DatabaseConfig | undefined>
   // If database type couldn't be detected from env, ask user
   if (config.dbUrlEnvName && !config.dbType) {
     ui.warning("Found database URL but couldn't determine database type.")
-    
+
     const { dbType } = await inquirer.prompt({
       type: "list",
       name: "dbType",
@@ -72,10 +86,10 @@ async function detectAndConfigureDatabase(): Promise<DatabaseConfig | undefined>
         { name: "MySQL", value: "mysql" },
         { name: "PostgreSQL", value: "postgres" },
         { name: "SQLite", value: "sqlite" },
-        { name: "MongoDB", value: "mongodb" }
-      ]
+        { name: "MongoDB", value: "mongodb" },
+      ],
     })
-    
+
     config.dbType = dbType as DatabaseType
   }
 
@@ -85,9 +99,10 @@ async function detectAndConfigureDatabase(): Promise<DatabaseConfig | undefined>
       type: "input",
       name: "dbName",
       message: "What is your database name?",
-      validate: (input: string) => input.trim().length > 0 || "Database name cannot be empty"
+      validate: (input: string) =>
+        input.trim().length > 0 || "Database name cannot be empty",
     })
-    
+
     config.dbName = dbName.trim()
   }
 
