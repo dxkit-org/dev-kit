@@ -1,24 +1,27 @@
 # Deployment Commands Examples
 
 ## Development Deployment
+
 ```bash
 # Deploy current main branch to dev branch (force push)
-adk deploy dev
+dk deploy dev
 # or
 npm run deploy:dev
 ```
 
 ## Production Deployment
+
 ```bash
 # Full production deployment workflow
-adk deploy prod
-# or  
+dk deploy prod
+# or
 npm run deploy:prod
 ```
 
 This command will:
+
 1. ✅ Pull from stable branch
-2. ✅ Check for uncommitted changes  
+2. ✅ Check for uncommitted changes
 3. ✅ Verify you're on main branch
 4. ✅ Auto-increment version if needed (internal helper)
 5. ✅ Run npm install
@@ -32,9 +35,9 @@ This command will:
 The CLI uses a hierarchical command structure:
 
 ```bash
-adk deploy --help          # Show deployment subcommands
-adk deploy dev --help      # Show dev deployment options
-adk deploy prod --help     # Show prod deployment options
+dk deploy --help          # Show deployment subcommands
+dk deploy dev --help      # Show dev deployment options
+dk deploy prod --help     # Show prod deployment options
 ```
 
 ## Version Management
@@ -47,12 +50,14 @@ Version incrementing is handled automatically by the `deploy prod` command when 
 ## Example Output
 
 ### deploy dev
+
 ```
 🚀 Deploying to development environment...
 ✅ Successfully deployed to development environment!
 ```
 
 ### deploy prod
+
 ```
 🚀 Starting production deployment...
 📦 Incrementing version...
@@ -66,6 +71,7 @@ Version incrementing is handled automatically by the `deploy prod` command when 
 ## Error Handling
 
 The CLI provides clear error messages:
+
 - ❌ "There are uncommitted changes" - commit or stash first
 - ❌ "You must be on the main branch" - switch to main
 - ❌ "package.json not found" - run from project root

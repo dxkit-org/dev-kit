@@ -1,1 +1,1 @@
- "advanced-dev-kit": "file:C:/primexopRepos/advanced-dev-kit",
+"@dxkit-org/dev-kit": "file:C:/dxkitRepos/dev-kit",

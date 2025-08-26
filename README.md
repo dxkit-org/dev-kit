@@ -1,11 +1,11 @@
-# 🚀 Advanced Development Kit (ADK)
+# 🚀 Development Kit (DK)
 
 > A comprehensive CLI toolkit for modern development workflows - featuring task automation, project cleaning, and developer utilities built with TypeScript.
 
-[![npm version](https://img.shields.io/npm/v/advanced-dev-kit.svg)](https://www.npmjs.com/package/advanced-dev-kit)
+[![npm version](https://img.shields.io/npm/v/@dxkit-org/dev-kit.svg)](https://www.npmjs.com/package/@dxkit-org/dev-kit)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![GitHub stars](https://img.shields.io/github/stars/AdarshHatkar/advanced-dev-kit.svg)](https://github.com/AdarshHatkar/advanced-dev-kit/stargazers)
-[![GitHub issues](https://img.shields.io/github/issues/AdarshHatkar/advanced-dev-kit.svg)](https://github.com/AdarshHatkar/advanced-dev-kit/issues)
+[![GitHub stars](https://img.shields.io/github/stars/dxkit-org/dev-kit.svg)](https://github.com/dxkit-org/dev-kit/stargazers)
+[![GitHub issues](https://img.shields.io/github/issues/dxkit-org/dev-kit.svg)](https://github.com/dxkit-org/dev-kit/issues)
 
 ## ✨ Features
 
@@ -15,36 +15,39 @@
 - ⚡ **Fast & Modern** - Built with TypeScript and optimized for performance
 - 🎨 **Beautiful UI** - Rich terminal interface with colors and animations
 
-
 ## 📦 Quick Start
 
 ### Option 1: Global Installation (Recommended)
+
 ```bash
-npm install -g advanced-dev-kit
+npm install -g @dxkit-org/dev-kit
 ```
 
-After global installation, use `adk` directly from anywhere:
+After global installation, use `dk` directly from anywhere:
+
 ```bash
-adk --help
-adk doctor
-adk clean
+dk --help
+dk doctor
+dk clean
 ```
 
 ### Option 2: Local Project Usage
+
 ```bash
 # Install locally
-npm install advanced-dev-kit
+npm install @dxkit-org/dev-kit
 
 # Use with npx
-npx adk --help
-npx adk clean
+npx dk --help
+npx dk clean
 ```
 
 ### Option 3: Development Setup
+
 ```bash
 # Clone and setup for development
-git clone https://github.com/AdarshHatkar/advanced-dev-kit.git
-cd advanced-dev-kit
+git clone https://github.com/dxkit-org/dev-kit.git
+cd dev-kit
 npm install
 npm run build
 
@@ -57,53 +60,62 @@ npm install -g .
 Once installed globally, here are the most common commands:
 
 ```bash
-# Check system health and ADK installation
-adk doctor
+# Check system health and DK installation
+dk doctor
 
 # Clean your project
-adk clean
+dk clean
 
 # Deploy to development
-adk deploy dev
+dk deploy dev
 
 # Deploy to production (with version management)
-adk deploy prod
+dk deploy prod
 
 # Get help
-adk --help
+dk --help
 ```
 
 ## 📖 Detailed Usage
 
-### 🧹 `adk clean`
+### 🧹 `dk clean`
+
 Clean temporary folders and files from your project.
 
 **What it cleans:**
+
 - `node_modules/` directories
 - Build artifacts (`dist/`, `build/`)
 - Temporary files and caches
 - Log files
 
 **Usage:**
+
 ```bash
-adk clean
+dk clean
 ```
 
-### 🚀 `adk deploy`
+### 🚀 `dk deploy`
+
 Deployment commands with smart workflows and version management.
 
 #### Deploy to Development
+
 ```bash
-adk deploy dev
+dk deploy dev
 ```
+
 - Pushes main branch to dev branch with force
 - Quick and simple development deployment
 
 #### Deploy to Production
+
 ```bash
-adk deploy prod
+dk deploy prod
 ```
+
 **Comprehensive production workflow:**
+
 - ✅ Pulls latest changes from stable branch
 - ✅ Checks for uncommitted changes
 - ✅ Ensures you're on the main branch
@@ -113,30 +125,34 @@ adk deploy prod
 - ✅ Creates pull request from main to stable
 - ✅ Opens PR in browser
 
-### 🩺 `adk doctor`
+### 🩺 `dk doctor`
+
 Run comprehensive system and environment diagnostics.
 
 **Checks:**
-- ADK installation status
+
+- DK installation status
 - Node.js and npm compatibility
 - Git availability and repository status
-- Available ADK commands
+- Available DK commands
 - Current project status
 
 **Usage:**
+
 ```bash
-adk doctor
+dk doctor
 ```
 
 ## ⚙️ Configuration
 
 ### Deployment Tracking
-ADK uses a `deploy.json` file to track deployment history and manage versions:
+
+DK uses a `deploy.json` file to track deployment history and manage versions:
 
 ```json
 {
   "last_deploy": "2025-07-05 14:30:00",
-  "hash": "abc123def456", 
+  "hash": "abc123def456",
   "version": "1.2.3"
 }
 ```
@@ -145,17 +161,18 @@ This file is automatically created and updated during production deployments.
 
 ## 🔧 Prerequisites for Production Deployment
 
-Before using `adk deploy prod`, ensure you have:
+Before using `dk deploy prod`, ensure you have:
 
 1. **✅ Git Repository**
    - Must be a git repository
    - Requires `main` and `stable` branches
 
-2. **✅ GitHub CLI** 
+2. **✅ GitHub CLI**
+
    ```bash
    # Install GitHub CLI
    npm install -g @github/cli
-   
+
    # Authenticate
    gh auth login
    ```
@@ -170,65 +187,72 @@ Before using `adk deploy prod`, ensure you have:
 ## 🛠️ Development
 
 ### Building the Project
+
 ```bash
 npm run build      # Build once
 npm run dev        # Build and watch for changes
 ```
 
 ### Available Scripts
+
 ```bash
 npm run build           # Build the project
-npm run dev             # Build and watch for changes  
+npm run dev             # Build and watch for changes
 npm run clean           # Clean build artifacts
-npm run deploy:dev      # Alias for 'adk deploy dev'
-npm run deploy:prod     # Alias for 'adk deploy prod'
+npm run deploy:dev      # Alias for 'dk deploy dev'
+npm run deploy:prod     # Alias for 'dk deploy prod'
 ```
 
 ## 🐛 Troubleshooting
 
 ### Common Issues
 
-**1. `adk: command not found`**
+**1. `dk: command not found`**
+
 ```bash
 # Reinstall globally
-npm install -g advanced-dev-kit
+npm install -g @dxkit-org/dev-kit
 
 # Or check if npm global bin is in PATH
 npm config get prefix
 ```
 
 **2. Permission errors on Windows**
+
 ```bash
 # Run PowerShell as Administrator, then:
-npm install -g advanced-dev-kit
+npm install -g @dxkit-org/dev-kit
 ```
 
 **3. Deploy command fails**
+
 ```bash
 # Check prerequisites
-adk doctor
+dk doctor
 
 # Ensure GitHub CLI is authenticated
 gh auth status
 ```
 
 ### Getting Help
+
 ```bash
 # Show help
-adk --help
+dk --help
 
 # Run diagnostics
-adk doctor
+dk doctor
 
 # Check version
-adk --version
+dk --version
 ```
 
 **Need more help?**
-- 📖 [Read the full documentation](https://github.com/AdarshHatkar/advanced-dev-kit#readme)
-- 🐛 [Report a bug](https://github.com/AdarshHatkar/advanced-dev-kit/issues/new)
-- 💡 [Request a feature](https://github.com/AdarshHatkar/advanced-dev-kit/issues/new)
-- 💬 [Join discussions](https://github.com/AdarshHatkar/advanced-dev-kit/discussions)
+
+- 📖 [Read the full documentation](https://github.com/dxkit-org/dev-kit#readme)
+- 🐛 [Report a bug](https://github.com/dxkit-org/dev-kit/issues/new)
+- 💡 [Request a feature](https://github.com/dxkit-org/dev-kit/issues/new)
+- 💬 [Join discussions](https://github.com/dxkit-org/dev-kit/discussions)
 
 ## 🤝 Contributing
 
@@ -237,8 +261,8 @@ We welcome contributions! Here's how to get started:
 1. **Fork the repository**
 2. **Clone your fork**
    ```bash
-   git clone https://github.com/your-username/advanced-dev-kit.git
-   cd advanced-dev-kit
+   git clone https://github.com/your-username/dev-kit.git
+   cd dev-kit
    ```
 3. **Install dependencies**
    ```bash
@@ -249,11 +273,12 @@ We welcome contributions! Here's how to get started:
    ```bash
    npm run build
    npm install -g .  # Install your changes globally
-   adk doctor        # Test the installation
+   dk doctor        # Test the installation
    ```
 6. **Submit a pull request**
 
 ### Development Guidelines
+
 - Use TypeScript for all new code
 - Follow the existing code style
 - Add tests for new features
@@ -275,6 +300,6 @@ MIT License - see the [LICENSE](LICENSE) file for details.
 
 **Made with ❤️ for developers who love beautiful and efficient tools**
 
-[Report Bug](https://github.com/AdarshHatkar/advanced-dev-kit/issues) • [Request Feature](https://github.com/AdarshHatkar/advanced-dev-kit/issues) • [Documentation](https://github.com/AdarshHatkar/advanced-dev-kit#readme)
+[Report Bug](https://github.com/dxkit-org/dev-kit/issues) • [Request Feature](https://github.com/dxkit-org/dev-kit/issues) • [Documentation](https://github.com/dxkit-org/dev-kit#readme)
 
 </div>

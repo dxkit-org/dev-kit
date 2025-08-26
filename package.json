@@ -44,15 +44,15 @@
   "sideEffects": false,
   "repository": {
     "type": "git",
-    "url": "https://github.com/AdarshHatkar/advanced-dev-kit.git"
+    "url": "https://github.com/dxkit-org/dev-kit.git"
   },
-  "homepage": "https://github.com/AdarshHatkar/advanced-dev-kit#readme",
+  "homepage": "https://github.com/dxkit-org/dev-kit#readme",
   "bugs": {
-    "url": "https://github.com/AdarshHatkar/advanced-dev-kit/issues"
+    "url": "https://github.com/dxkit-org/dev-kit/issues"
   },
   "author": {
-    "name": "Adarsh Hatkar",
-    "url": "https://github.com/AdarshHatkar"
+    "name": "dxkit-org",
+    "url": "https://github.com/dxkit-org"
   },
   "license": "MIT",
   "engines": {
@@ -68,8 +68,8 @@
     "prepublishOnly": "npm run clean && npm run build",
     "release:patch": "npm version patch",
     "postversion": "git push && git push --tags && npm publish",
-    "deploy:dev": "adk deploy dev",
-    "deploy:prod": "adk deploy prod",
+    "deploy:dev": "dk deploy dev",
+    "deploy:prod": "dk deploy prod",
     "link": "npm run build && npm link",
     "unlink": "npm unlink -g run-project-commands"
   },
