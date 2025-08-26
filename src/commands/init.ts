@@ -18,6 +18,7 @@ const PROJECT_TYPES: { name: string; value: DKProjectType }[] = [
   { name: "Vite + React", value: "vite-react" },
   { name: "React Native CLI", value: "react-native-cli" },
   { name: "Spring Boot Microservices", value: "spring-boot-microservice" },
+  { name: "Next.js", value: "nextjs" },
 ]
 
 export async function init() {

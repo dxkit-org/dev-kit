@@ -3,6 +3,7 @@ export type DKProjectType =
   | "vite-react"
   | "react-native-cli"
   | "spring-boot-microservice"
+  | "nextjs"
 
 export type DatabaseType = "mysql" | "postgres" | "sqlite" | "mongodb"
 

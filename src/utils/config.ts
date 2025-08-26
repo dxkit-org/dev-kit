@@ -56,6 +56,7 @@ export function detectProjectType(
   // node-express: look for express in package.json deps
   // vite-react: look for vite and react in package.json deps
   // react-native-cli: look for react-native in package.json deps
+  // nextjs: look for next in package.json deps
   // spring-boot-microservice: look for pom.xml files or Spring Boot structure
   try {
     // Check for Spring Boot first
@@ -67,6 +68,7 @@ export function detectProjectType(
     if (!existsSync(pkgPath)) return null
     const pkg = JSON.parse(readFileSync(pkgPath, "utf8"))
     const deps = { ...pkg.dependencies, ...pkg.devDependencies }
+    if (deps["next"]) return "nextjs"
     if (deps["express"]) return "node-express"
     if (deps["vite"] && deps["react"]) return "vite-react"
     if (deps["react-native"]) return "react-native-cli"
