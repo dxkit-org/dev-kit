@@ -27,6 +27,7 @@ export interface SpringBootConfig {
 
 export interface AssetsTypeGeneratorConfig {
   imagesDir: string
+  imageNameCase?: "kebab-case" | "snake_case" | "any"
 }
 
 export interface DKConfig {

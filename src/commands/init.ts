@@ -286,7 +286,20 @@ async function configureAssetsTypeGenerator(
     },
   })
 
+  const { imageNameCase } = await inquirer.prompt({
+    type: "list",
+    name: "imageNameCase",
+    message: "How would you like image files to be named?",
+    choices: [
+      { name: "kebab-case (my-image.png)", value: "kebab-case" },
+      { name: "snake_case (my_image.png)", value: "snake_case" },
+      { name: "any (keep original names)", value: "any" },
+    ],
+    default: "kebab-case",
+  })
+
   return {
     imagesDir: imagesDir.trim(),
+    imageNameCase,
   }
 }

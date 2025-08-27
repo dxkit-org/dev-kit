@@ -22,6 +22,43 @@ function toCamel(str: string): string {
     .replace(/[^a-zA-Z0-9]/g, "")
 }
 
+function toKebabCase(str: string): string {
+  return str
+    .replace(/([a-z])([A-Z])/g, '$1-$2')
+    .replace(/[\s_\.]+/g, '-')
+    .toLowerCase()
+    .replace(/[^a-z0-9\-]/g, '')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
+}
+
+function toSnakeCase(str: string): string {
+  return str
+    .replace(/([a-z])([A-Z])/g, '$1_$2')
+    .replace(/[\s\-\.]+/g, '_')
+    .toLowerCase()
+    .replace(/[^a-z0-9_]/g, '')
+    .replace(/_+/g, '_')
+    .replace(/^_|_$/g, '')
+}
+
+function convertImageName(fileName: string, nameCase: "kebab-case" | "snake_case" | "any"): string {
+  if (nameCase === "any") {
+    return fileName
+  }
+  
+  const ext = path.extname(fileName)
+  const nameWithoutExt = path.basename(fileName, ext)
+  
+  if (nameCase === "kebab-case") {
+    return toKebabCase(nameWithoutExt) + ext
+  } else if (nameCase === "snake_case") {
+    return toSnakeCase(nameWithoutExt) + ext
+  }
+  
+  return fileName
+}
+
 function toValidIdentifier(str: string): string {
   const cleaned = str.replace(/[^a-zA-Z0-9_]/g, "_")
   return /^[a-zA-Z_]/.test(cleaned) ? cleaned : `_${cleaned}`
@@ -86,6 +123,38 @@ function objectToTS(obj: any, indent = 0): string {
   return obj
 }
 
+async function renameImagesInDirectory(
+  dir: string, 
+  nameCase: "kebab-case" | "snake_case" | "any"
+): Promise<Map<string, string>> {
+  const renameMap = new Map<string, string>()
+  
+  if (nameCase === "any") {
+    return renameMap
+  }
+
+  const allFiles = await walk(dir)
+  
+  for (const filePath of allFiles) {
+    const fileName = path.basename(filePath)
+    const convertedName = convertImageName(fileName, nameCase)
+    
+    if (fileName !== convertedName) {
+      const newPath = path.join(path.dirname(filePath), convertedName)
+      
+      // Check if target file already exists
+      if (existsSync(newPath)) {
+        throw new Error(`Cannot rename ${fileName} to ${convertedName}: target file already exists`)
+      }
+      
+      await fs.rename(filePath, newPath)
+      renameMap.set(filePath, newPath)
+    }
+  }
+  
+  return renameMap
+}
+
 export const generateImageIndex = async (): Promise<void> => {
   const config = readConfig()
 
@@ -114,6 +183,7 @@ export const generateImageIndex = async (): Promise<void> => {
   }
 
   const imagesDir = path.resolve(config.assetsTypeGenerator.imagesDir)
+  const imageNameCase = config.assetsTypeGenerator.imageNameCase || "kebab-case"
 
   if (!existsSync(imagesDir)) {
     ui.error(
@@ -129,6 +199,16 @@ export const generateImageIndex = async (): Promise<void> => {
   spinner.start()
 
   try {
+    // First, rename all images according to the specified naming convention
+    spinner.text = "Renaming images to match naming convention..."
+    const renameMap = await renameImagesInDirectory(imagesDir, imageNameCase)
+    
+    if (renameMap.size > 0) {
+      ui.info(`Renamed ${renameMap.size} files to match ${imageNameCase} convention`)
+    }
+
+    // Now scan for all files (including renamed ones)
+    spinner.text = "Scanning for images..."
     const allFiles = await walk(imagesDir)
 
     spinner.text = "Processing images..."
@@ -204,6 +284,7 @@ export const generateImageIndex = async (): Promise<void> => {
         key: "Images directory",
         value: path.relative(process.cwd(), imagesDir),
       },
+      { key: "Naming convention", value: imageNameCase },
     ])
   } catch (error) {
     spinner.fail("Failed to generate image index")
