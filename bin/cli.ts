@@ -26,6 +26,7 @@ import { init as runInit } from "../src/commands/init.js"
 import { updateConfig } from "../src/commands/config.js"
 import { startSpringBootServices } from "../src/commands/springBoot.js"
 import { assets } from "../src/commands/assets.js"
+import { gitFix } from "../src/commands/git.js"
 
 // Get package.json version
 const __filename = fileURLToPath(import.meta.url)
@@ -526,6 +527,23 @@ async function main() {
       await cmd.execute(...args)
     })
 
+  // Git commands
+  const gitCommand = program
+    .command("git")
+    .description(chalk.gray("🔧 Git configuration tools"))
+
+  gitCommand
+    .command("fix")
+    .description(chalk.gray("🔧 Fix git core.ignorecase configuration"))
+    .action(async (...args) => {
+      const cmd = createEnhancedCommand(
+        "Git configuration fix",
+        "Fixing git ignorecase settings",
+        gitFix
+      )
+      await cmd.execute(...args)
+    })
+
   // Add help enhancement
   program.on("--help", () => {
     console.log("\n")
@@ -555,6 +573,9 @@ async function main() {
           "\n" +
           chalk.gray("• Assets: ") +
           chalk.cyan("dk assets gen") +
+          "\n" +
+          chalk.gray("• Git Fix: ") +
+          chalk.cyan("dk git fix") +
           "\n" +
           chalk.gray("• Help: ") +
           chalk.cyan("dk --help"),
