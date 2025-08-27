@@ -145,14 +145,30 @@ async function renameImagesInDirectory(
     if (fileName !== convertedName) {
       const newPath = path.join(path.dirname(filePath), convertedName)
 
-      // Check if target file already exists
-      if (existsSync(newPath)) {
+      // Handle case-insensitive file systems (like Windows)
+      // where the source and target might be considered the same file
+      if (
+        existsSync(newPath) &&
+        fileName.toLowerCase() !== convertedName.toLowerCase()
+      ) {
         throw new Error(
           `Cannot rename ${fileName} to ${convertedName}: target file already exists`
         )
       }
 
-      await fs.rename(filePath, newPath)
+      // For case-only changes on case-insensitive file systems,
+      // use a temporary filename to avoid conflicts
+      if (
+        fileName.toLowerCase() === convertedName.toLowerCase() &&
+        fileName !== convertedName
+      ) {
+        const tempPath = path.join(path.dirname(filePath), `${fileName}.tmp`)
+        await fs.rename(filePath, tempPath)
+        await fs.rename(tempPath, newPath)
+      } else {
+        await fs.rename(filePath, newPath)
+      }
+
       renameMap.set(filePath, newPath)
     }
   }
