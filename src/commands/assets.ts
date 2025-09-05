@@ -257,20 +257,27 @@ export const generateImageIndex = async (): Promise<void> => {
       const fileKey = toCamel(baseNoExt)
       const dirKeys = dirParts.map(toCamel)
 
-      // Variable name: dir parts + file name joined to avoid collisions
-      const varBase = toValidIdentifier(
-        [...dirParts, baseNoExt].map(toCamel).filter(Boolean).join("_") ||
-          toCamel(baseNoExt)
-      )
-      const varName = ensureUnique(varBase || "img", usedVarNames)
-
       // Import path should be relative from index.ts
       const importPath = `./${relFromImages}`
-      imports.push(`import ${varName} from ${JSON.stringify(importPath)};`)
-
-      // Place into tree
-      const keysPath = [...dirKeys, fileKey || "image"]
-      setInTree(tree, keysPath, varName)
+      
+      // For React Native CLI projects, use require() directly in tree
+      // For other projects, use imports with variable names
+      if (config.projectType === "react-native-cli") {
+        const requireStatement = `require(${JSON.stringify(importPath)})`
+        const keysPath = [...dirKeys, fileKey || "image"]
+        setInTree(tree, keysPath, requireStatement)
+      } else {
+        // Variable name: dir parts + file name joined to avoid collisions
+        const varBase = toValidIdentifier(
+          [...dirParts, baseNoExt].map(toCamel).filter(Boolean).join("_") ||
+            toCamel(baseNoExt)
+        )
+        const varName = ensureUnique(varBase || "img", usedVarNames)
+        
+        imports.push(`import ${varName} from ${JSON.stringify(importPath)};`)
+        const keysPath = [...dirKeys, fileKey || "image"]
+        setInTree(tree, keysPath, varName)
+      }
     }
 
     // Stable ordering
@@ -284,9 +291,17 @@ export const generateImageIndex = async (): Promise<void> => {
    * Run: dk assets gen
    */
 `
-    const body =
-      `${imports.sort().join("\n")}\n\n` +
-      `export const ImageAssets = ${objectToTS(sortedTree)} as const;\n`
+    let body: string
+    
+    if (config.projectType === "react-native-cli") {
+      // For React Native CLI, export with require statements in nested structure
+      body = `export const ImageAssets = ${objectToTS(sortedTree)};\n`
+    } else {
+      // For other projects, use imports and nested tree structure
+      body =
+        `${imports.sort().join("\n")}\n\n` +
+        `export const ImageAssets = ${objectToTS(sortedTree)} as const;\n`
+    }
 
     await fs.writeFile(outputFile, header + body, "utf8")
 
