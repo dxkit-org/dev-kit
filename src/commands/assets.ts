@@ -313,6 +313,9 @@ export const generateImageIndex = async (): Promise<void> => {
 
     spinner.stop()
 
+    // Apply ESLint and Prettier formatting if configs are present
+    await ui.formatGeneratedFile(outputFile, process.cwd())
+
     const message =
       allFiles.length === 0
         ? "Image index generated with empty object (no images found)"
