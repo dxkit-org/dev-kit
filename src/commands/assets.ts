@@ -15,6 +15,51 @@ const IMAGE_EXTS = new Set([
   ".avif",
 ])
 
+async function updateVSCodeSettings(indexFilePath: string): Promise<void> {
+  const vscodeDir = path.join(process.cwd(), ".vscode")
+  const settingsPath = path.join(vscodeDir, "settings.json")
+
+  // Ensure .vscode directory exists
+  if (!existsSync(vscodeDir)) {
+    await fs.mkdir(vscodeDir, { recursive: true })
+  }
+
+  let settings: any = {}
+
+  // Read existing settings if file exists
+  if (existsSync(settingsPath)) {
+    try {
+      const settingsContent = await fs.readFile(settingsPath, "utf8")
+      settings = JSON.parse(settingsContent)
+    } catch (error) {
+      ui.warning(
+        "Failed to parse existing VS Code settings",
+        "Creating new settings file"
+      )
+    }
+  }
+
+  // Get relative path from workspace root to index file
+  const relativeIndexPath = path
+    .relative(process.cwd(), indexFilePath)
+    .replace(/\\/g, "/")
+
+  // Initialize files.readonlyInclude if it doesn't exist
+  if (!settings["files.readonlyInclude"]) {
+    settings["files.readonlyInclude"] = {}
+  }
+
+  // Add the index file to readonly settings
+  settings["files.readonlyInclude"][relativeIndexPath] = true
+
+  // Write updated settings
+  await fs.writeFile(
+    settingsPath,
+    JSON.stringify(settings, null, 2) + "\n",
+    "utf8"
+  )
+}
+
 function toCamel(str: string): string {
   return str
     .replace(/[_\s\-\.]+(.)?/g, (_, c) => (c ? c.toUpperCase() : ""))
@@ -287,7 +332,10 @@ export const generateImageIndex = async (): Promise<void> => {
 
     spinner.text = "Generating index file..."
 
-    const header = `/* AUTO-GENERATED FILE. DO NOT EDIT.
+    const hideComment = config.assetsTypeGenerator.hideStartingComment || false
+    const header = hideComment
+      ? ""
+      : `/* AUTO-GENERATED FILE. DO NOT EDIT.
    * Run: dk assets gen
    */
 `
@@ -304,6 +352,17 @@ export const generateImageIndex = async (): Promise<void> => {
     }
 
     await fs.writeFile(outputFile, header + body, "utf8")
+
+    // Update VS Code settings to make the index file readonly
+    spinner.text = "Updating VS Code settings..."
+    try {
+      await updateVSCodeSettings(outputFile)
+    } catch (error) {
+      ui.warning(
+        "Failed to update VS Code settings",
+        "You may need to manually add the index file to readonly settings"
+      )
+    }
 
     spinner.stop()
 
