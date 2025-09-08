@@ -332,13 +332,16 @@ export const generateImageIndex = async (): Promise<void> => {
 
     spinner.text = "Generating index file..."
 
-    const hideComment = config.assetsTypeGenerator.hideStartingComment || false
-    const header = hideComment
-      ? ""
-      : `/* AUTO-GENERATED FILE. DO NOT EDIT.
+    const infoComment = config.assetsTypeGenerator.infoComment || "short_info"
+    let header = ""
+    
+    if (infoComment === "short_info") {
+      header = `/* AUTO-GENERATED FILE. DO NOT EDIT.
    * Run: dk assets gen
    */
 `
+    }
+    // If infoComment === "hidden", header remains empty
     let body: string
 
     if (config.projectType === "react-native-cli") {

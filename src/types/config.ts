@@ -28,7 +28,7 @@ export interface SpringBootConfig {
 export interface AssetsTypeGeneratorConfig {
   imagesDir: string
   imageNameCase?: "kebab-case" | "snake_case" | "any"
-  hideStartingComment?: boolean
+  infoComment?: "hidden" | "short_info"
 }
 
 export interface DKConfig {
