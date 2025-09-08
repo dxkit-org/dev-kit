@@ -30,14 +30,14 @@ async function createInitialVSCodeSettings(
 ): Promise<void> {
   const vscodeDir = path.join(process.cwd(), ".vscode")
   const settingsPath = path.join(vscodeDir, "settings.json")
-  
+
   // Create .vscode directory if it doesn't exist
   if (!existsSync(vscodeDir)) {
     await fs.mkdir(vscodeDir, { recursive: true })
   }
-  
+
   let settings: any = {}
-  
+
   // Read existing settings if file exists
   if (existsSync(settingsPath)) {
     try {
@@ -47,7 +47,7 @@ async function createInitialVSCodeSettings(
       // If parsing fails, start fresh
     }
   }
-  
+
   // Initialize files.readonlyInclude if it doesn't exist
   if (!settings["files.readonlyInclude"]) {
     settings["files.readonlyInclude"] = {
@@ -55,15 +55,19 @@ async function createInitialVSCodeSettings(
       "node_modules/**": true,
     }
   }
-  
+
   // Add assets index file if assets config exists
   if (assetsConfig) {
     const indexPath = path.posix.join(assetsConfig.imagesDir, "index.ts")
     settings["files.readonlyInclude"][indexPath] = true
   }
-  
+
   // Write settings file
-  await fs.writeFile(settingsPath, JSON.stringify(settings, null, 2) + "\n", "utf8")
+  await fs.writeFile(
+    settingsPath,
+    JSON.stringify(settings, null, 2) + "\n",
+    "utf8"
+  )
 }
 
 export async function init() {
@@ -129,7 +133,10 @@ export async function init() {
       await createInitialVSCodeSettings(assetsTypeGeneratorConfig)
       ui.info("VS Code settings configured with readonly includes")
     } catch (error) {
-      ui.warning("Failed to create VS Code settings", "You can configure them manually")
+      ui.warning(
+        "Failed to create VS Code settings",
+        "You can configure them manually"
+      )
     }
 
     ui.success("Created dk.config.json", `Project type: ${projectType}`)
